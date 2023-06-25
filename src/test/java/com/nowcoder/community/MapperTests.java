@@ -1,8 +1,10 @@
 package com.nowcoder.community;
 
 import com.nowcoder.community.dao.DiscussPostMapper;
+import com.nowcoder.community.dao.LoginTicketMapper;
 import com.nowcoder.community.dao.UserMapper;
 import com.nowcoder.community.entity.DiscussPost;
+import com.nowcoder.community.entity.LoginTicket;
 import com.nowcoder.community.entity.User;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +22,8 @@ import java.util.List;
 public class MapperTests {
     @Autowired
     private UserMapper userMapper; //记住要在执行测试前在CommunityApplication类中加入@MapperScan注解，才会开启mapper接口的扫描
+
+
 
     @Test
     public void selectTest() {
@@ -66,6 +70,27 @@ public class MapperTests {
         }
         System.out.println(rows);
 
+    }
+
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
+
+    @Test
+    public void testInsertLoginTicket() {
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(123);
+        loginTicket.setStatus(0);
+        loginTicket.setTicket("abc");
+        loginTicket.setExpired(new Date(System.currentTimeMillis() + 1000 * 60 * 10));
+
+        loginTicketMapper.insertLoginTicket(loginTicket);
+    }
+    @Test
+    public void testSelectLoginTicket() {
+        LoginTicket loginTicket = loginTicketMapper.selectByTicket("abc");
+        System.out.println(loginTicket);
+        loginTicketMapper.updateStatus("abc", 3);
+        System.out.println(loginTicket.getStatus());
     }
 
 
