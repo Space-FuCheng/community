@@ -28,7 +28,7 @@
 								<a class="nav-link" th:href="@{/index}">首页</a>
 							</li>
 							<li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser!=null}">
-								<a class="nav-link position-relative" href="site/letter.html">消息<span class="badge badge-danger">12</span></a>
+								<a class="nav-link position-relative" th:href="@{/letter/list}">消息<span class="badge badge-danger">12</span></a>
 							</li>
 							<li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser==null}">
 								<a class="nav-link" th:href="@{/register}">注册</a>
@@ -43,7 +43,8 @@
 									<img th:src="${loginUser.headerUrl}" class="rounded-circle" style="width:30px;"/>
 								</a>
 								<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-									<a class="dropdown-item text-center" href="site/profile.html">个人主页</a>
+<!--									这里链接设置为：在控制器中你要映射的路径，注意因为你链接中有变量，所以需要用||进行拼常量和变量-->
+									<a class="dropdown-item text-center" th:href="@{|/user/profile/${loginUser.id}|}">个人主页</a>
 									<a class="dropdown-item text-center" th:href="@{/user/setting}">账号设置</a>
 									<a class="dropdown-item text-center" th:href="@{/logout}">退出登录</a>
 									<div class="dropdown-divider"></div>
@@ -124,13 +125,14 @@
 				<!-- 帖子列表 -->
 				<ul class="list-unstyled">
 					<li class="media pb-3 pt-3 mb-3 border-bottom" th:each="map:${discussPosts}"> <!--${}里的是要遍历的对象，前面的map是变量名，可随意取名。而后可以通过map获取需要的数据-->
-						<a href="site/profile.html">
+						<a th:href="@{|/user/profile/${map.user.id}|}">
 							<img th:src="${map.user.headerUrl}" class="mr-4 rounded-circle" alt="用户头像" style="width:50px;height:50px;">
 <!--							写的是.一个属性但是其底层调用的是get-->
 						</a>
 						<div class="media-body">
 							<h6 class="mt-0 mb-3">
-								<a href="site/discuss-detail.html" th:utext="${map.post.title}">备战春招，面试刷题跟他复习，一个月全搞定！</a>
+<!--								这里的链接就是Controller里mapping的path，在index点了之后就能链到详情页了-->
+								<a th:href="@{|/discuss/detail/${map.post.id}|}" th:utext="${map.post.title}">备战春招，面试刷题跟他复习，一个月全搞定！</a>
 <!--								text和utext区别，utext会将转义字符进行解释，如&lt;解释为<-->
 								<span class="badge badge-secondary bg-primary" th:if="${map.post.type==1}">置顶</span>
 								<span class="badge badge-secondary bg-danger" th:if="${map.post.status==1}">精华</span>
@@ -139,9 +141,11 @@
 								<u class="mr-3" th:utext="${map.user.username}">寒江雪</u> 发布于 <b th:text="${#dates.format(map.post.createTime, 'yyyy-MM-dd HH:mm:ss')}">2019-04-15 15:32:18</b>
 <!--								日期要进行格式化，符合中国的时间显示格式-->
 								<ul class="d-inline float-right">
-									<li class="d-inline ml-2">赞 11</li>
+									<li class="d-inline ml-2">
+										赞 <span th:text="${map.likeCount}">11</span>
+									</li>
 									<li class="d-inline ml-2">|</li>
-									<li class="d-inline ml-2">回帖 7</li>
+									<li class="d-inline ml-2">回帖 <span th:text="${map.post.commentCount}">7</span></li>
 								</ul>
 							</div>
 						</div>						
@@ -149,7 +153,7 @@
 
 				</ul>
 				<!-- 分页 -->
-				<nav class="mt-5" th:if="${page.rows>0}"> <!--没数据就不显示分页了-->
+				<nav class="mt-5" th:if="${page.rows>0}" th:fragment="pagination"> <!--没数据就不显示分页了-->
 					<ul class="pagination justify-content-center">
 <!--						注意这个语法不要写错了@{${page.path}(current=1)}-->
 						<li class="page-item">
